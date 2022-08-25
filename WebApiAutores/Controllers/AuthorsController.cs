@@ -18,7 +18,7 @@ namespace WebApiAutores.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
-            return await context.Authors.ToListAsync();
+            return await context.Authors.Include(author => author.Books).ToListAsync();
         }
 
         [HttpPost]
@@ -36,7 +36,7 @@ namespace WebApiAutores.Controllers
             {
                 return BadRequest("Author id don't match");
             }
-            var existAuthor = await context.Authors.AnyAsync(x => x.Id == id);
+            var existAuthor = await context.Authors.AnyAsync(author => author.Id == id);
             if (!existAuthor)
             {
                 return NotFound("Author not found");
@@ -49,7 +49,7 @@ namespace WebApiAutores.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteAuthor(int id)
         {
-            var existAuthor = await context.Authors.AnyAsync(x => x.Id == id);
+            var existAuthor = await context.Authors.AnyAsync(author => author.Id == id);
             if (!existAuthor)
             {
                 return NotFound("Author not found");

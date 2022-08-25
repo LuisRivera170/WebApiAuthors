@@ -22,8 +22,6 @@
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Entities\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>
