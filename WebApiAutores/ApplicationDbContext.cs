@@ -10,7 +10,7 @@ namespace WebApiAutores
 
         }
 
-        public DbSet<Author> MyProperty { get; set; }
+        public DbSet<Author> Authors { get; set; }
     }
 }
 
