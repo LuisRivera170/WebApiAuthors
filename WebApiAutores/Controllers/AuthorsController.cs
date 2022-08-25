@@ -21,8 +21,19 @@ namespace WebApiAutores.Controllers
             return await context.Authors.Include(author => author.Books).ToListAsync();
         }
 
+        [HttpGet("{name=Pedro}")]
+        public async Task<IActionResult> GetAuthor([FromRoute] string name, [FromQuery] int id) 
+        {
+            var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));
+            if (author == null)
+            {
+                return NotFound($"Author with name \"{name}\" not found");
+            }
+            return Ok(author);
+        }
+
         [HttpPost]
-        public async Task<ActionResult> PostAuthor(Author author)
+        public async Task<ActionResult> PostAuthor([FromBody] Author author)
         {
             context.Add(author);
             await context.SaveChangesAsync();

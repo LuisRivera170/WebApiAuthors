@@ -18,7 +18,13 @@ namespace WebApiAutores.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            return await context.Books.Include(book => book.Author).FirstOrDefaultAsync(book => book.Id == id);
+            var book = await context.Books.Include(book => book.Author).FirstOrDefaultAsync(book => book.Id == id);
+            if (book == null)
+            {
+                return NotFound($"Author with Id {id} not found");
+            }
+
+            return book;
         }
 
         [HttpPost]
