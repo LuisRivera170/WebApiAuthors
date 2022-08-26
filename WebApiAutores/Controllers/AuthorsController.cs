@@ -70,14 +70,14 @@ namespace WebApiAutores.Controllers
             return Ok();
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult> PutAuthor(Author author, int id)
+        [HttpPut("{authorId:int}")]
+        public async Task<ActionResult> PutAuthor(Author author, int authorId)
         {
-            if (author.Id != id)
+            if (author.Id != authorId)
             {
                 return BadRequest("Author id don't match");
             }
-            var existAuthor = await context.Authors.AnyAsync(author => author.Id == id);
+            var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);
             if (!existAuthor)
             {
                 return NotFound("Author not found");
@@ -87,15 +87,15 @@ namespace WebApiAutores.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteAuthor(int id)
+        [HttpDelete("{authorId:int}")]
+        public async Task<ActionResult> DeleteAuthor(int authorId)
         {
-            var existAuthor = await context.Authors.AnyAsync(author => author.Id == id);
+            var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);
             if (!existAuthor)
             {
                 return NotFound("Author not found");
             }
-            context.Remove(new Author() { Id = id });
+            context.Remove(new Author() { Id = authorId });
             await context.SaveChangesAsync();
             return Ok();
         }

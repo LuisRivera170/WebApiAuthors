@@ -19,13 +19,13 @@ namespace WebApiAutores.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<BookDTO>> GetBook(int id)
+        [HttpGet("{bookId:int}")]
+        public async Task<ActionResult<BookDTO>> GetBook(int bookId)
         {
-            var book = await context.Books.FirstOrDefaultAsync(book => book.Id == id);
+            var book = await context.Books.Include(libroDB => libroDB.Comments).FirstOrDefaultAsync(book => book.Id == bookId);
             if (book == null)
             {
-                return NotFound($"Book with Id {id} not found");
+                return NotFound($"Book with Id {bookId} not found");
             }
 
             return mapper.Map<BookDTO>(book);
