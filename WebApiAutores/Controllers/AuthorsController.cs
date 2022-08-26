@@ -2,6 +2,7 @@
 using WebApiAutores.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using WebApiAutores.Filters;
 
 namespace WebApiAutores.Controllers
 {
@@ -19,14 +20,18 @@ namespace WebApiAutores.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
+        /* Filter examples */
         [Authorize]
         [ResponseCache(Duration = 10)]
+        /* ------ */
+        [HttpGet]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
             logger.LogInformation("Getting all authors");
             return await context.Authors.Include(author => author.Books).ToListAsync();
         }
 
+        // Especific filter
+        [ServiceFilter(typeof (FilterAction))]
         [HttpGet("{name=Pedro}")]
         public async Task<IActionResult> GetAuthor([FromRoute] string name, [FromQuery] int id) 
         {
