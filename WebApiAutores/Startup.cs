@@ -19,9 +19,11 @@ namespace WebApiAutores
                     option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
                 );
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
-            );
+            services
+                .AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
+                );
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
         }

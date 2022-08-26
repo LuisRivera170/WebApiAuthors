@@ -10,14 +10,17 @@ namespace WebApiAutores.Controllers
     public class AuthorsController: ControllerBase
     {
         private readonly ApplicationDbContext context;
+        private readonly ILogger<AuthorsController> logger;
 
-        public AuthorsController(ApplicationDbContext context)
+        public AuthorsController(ApplicationDbContext context, ILogger<AuthorsController> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
+            logger.LogInformation("Getting all authors");
             return await context.Authors.Include(author => author.Books).ToListAsync();
         }
 
