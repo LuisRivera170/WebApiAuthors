@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiAutores.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApiAutores.Controllers
 {
@@ -19,6 +20,8 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        [ResponseCache(Duration = 10)]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
             logger.LogInformation("Getting all authors");
             return await context.Authors.Include(author => author.Books).ToListAsync();
