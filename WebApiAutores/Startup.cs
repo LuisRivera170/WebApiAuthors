@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebApiAutores.Filters;
 using WebApiAutores.Middlewares;
+using WebApiAutores.Services;
 
 namespace WebApiAutores
 {
@@ -32,6 +33,11 @@ namespace WebApiAutores
                 );
 
             services.AddTransient<FilterAction>();
+            
+            /* Recurrent function with HostedService
+                services.AddHostedService<WriteInFile>();
+            */
+
 
             services.AddResponseCaching();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();

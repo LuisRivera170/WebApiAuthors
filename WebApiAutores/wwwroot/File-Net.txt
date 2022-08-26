@@ -1,0 +1,17 @@
+Process initialized
+Excecution process 26/08/2022 12:55:43
+Excecution process 26/08/2022 12:55:48
+Excecution process 26/08/2022 12:55:53
+Excecution process 26/08/2022 12:55:58
+Excecution process 26/08/2022 12:56:03
+Excecution process 26/08/2022 12:56:08
+Excecution process 26/08/2022 12:56:13
+Excecution process 26/08/2022 12:56:18
+Excecution process 26/08/2022 12:56:23
+Excecution process 26/08/2022 12:56:28
+Excecution process 26/08/2022 12:56:33
+Excecution process 26/08/2022 12:56:38
+Excecution process 26/08/2022 12:56:43
+Excecution process 26/08/2022 12:56:48
+Excecution process 26/08/2022 12:56:53
+Process finalized
