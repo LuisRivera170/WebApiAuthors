@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiAutores.Entities;
 using Microsoft.EntityFrameworkCore;
+using WebApiAutores.DTOs;
+using AutoMapper;
 
 namespace WebApiAutores.Controllers
 {
@@ -11,17 +13,21 @@ namespace WebApiAutores.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly ILogger<AuthorsController> logger;
+        private readonly IMapper mapper;
 
-        public AuthorsController(ApplicationDbContext context, ILogger<AuthorsController> logger)
+        public AuthorsController(ApplicationDbContext context, ILogger<AuthorsController> logger, IMapper mapper)
         {
             this.context = context;
             this.logger = logger;
+            this.mapper = mapper;
         }
 
-        /*[HttpGet]
+        [HttpGet]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
-            return await context.Authors.Include(author => author.Books).ToListAsync();
-        }*/
+            return await context.Authors
+                //.Include(author => author.Books)
+                .ToListAsync();
+        }
 
         [HttpGet("{name}")]
         public async Task<IActionResult> GetAuthor([FromRoute] string name) 
@@ -35,14 +41,16 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostAuthor([FromBody] Author author)
+        public async Task<ActionResult> PostAuthor([FromBody] CreateAuthorDTO authorDTO)
         {
-            var existAuthor = await context.Authors.AnyAsync(authorDB => authorDB.Name == author.Name);
+            var existAuthor = await context.Authors.AnyAsync(author => author.Name == authorDTO.Name);
 
             if (existAuthor)
             {
-                return BadRequest($"Author with name {author.Name} al ready exist");
+                return BadRequest($"Author with name {authorDTO.Name} al ready exist");
             }
+
+            var author = mapper.Map<Author>(authorDTO);
 
             context.Add(author);
             await context.SaveChangesAsync();
