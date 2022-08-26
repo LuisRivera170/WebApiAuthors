@@ -15,6 +15,7 @@ namespace WebApiAutores.Entities
         [Range(14, 100)]
         [NotMapped]
         public int Age { get; set; }
+        [NotMapped]
         public string IdCard { get; set; }
         public List<Book> Books { get; set; }
 

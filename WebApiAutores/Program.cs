@@ -8,7 +8,9 @@ startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
-startup.Configure(app, app.Environment);
+var logger = (ILogger<Startup>) app.Services.GetService(typeof (ILogger<Startup>));
+
+startup.Configure(app, app.Environment, logger);
 
 app.Run();
 
