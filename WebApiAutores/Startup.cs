@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebApiAutores.Filters;
 using WebApiAutores.Middlewares;
-using WebApiAutores.Services;
 
 namespace WebApiAutores
 {
@@ -32,14 +31,6 @@ namespace WebApiAutores
                     options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
                 );
 
-            services.AddTransient<FilterAction>();
-            
-            /* Recurrent function with HostedService
-                services.AddHostedService<WriteInFile>();
-            */
-
-
-            services.AddResponseCaching();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
             services.AddEndpointsApiExplorer();
@@ -48,32 +39,14 @@ namespace WebApiAutores
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Middleware for specific route
-            app.Map("/middleware", app =>
-            {
-                app.Run(async context => {
-                    await context.Response.WriteAsync("Middleware interception");
-                });
-            });
-            
-            // Class middleware
-            //app.UseMiddleware<LogResponseHTTPMiddleware>();
-            app.UseLogResponseHTTP();
-
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseResponseCaching();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

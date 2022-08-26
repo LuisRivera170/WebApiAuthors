@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiAutores.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using WebApiAutores.Filters;
 
 namespace WebApiAutores.Controllers
 {
@@ -20,20 +18,13 @@ namespace WebApiAutores.Controllers
             this.logger = logger;
         }
 
-        /* Filter examples */
-        [Authorize]
-        [ResponseCache(Duration = 10)]
-        /* ------ */
-        [HttpGet]
+        /*[HttpGet]
         public async Task<ActionResult<List<Author>>> GetAuthors() {
-            logger.LogInformation("Getting all authors");
             return await context.Authors.Include(author => author.Books).ToListAsync();
-        }
+        }*/
 
-        // Especific filter
-        [ServiceFilter(typeof (FilterAction))]
-        [HttpGet("{name=Pedro}")]
-        public async Task<IActionResult> GetAuthor([FromRoute] string name, [FromQuery] int id) 
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetAuthor([FromRoute] string name) 
         {
             var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));
             if (author == null)
