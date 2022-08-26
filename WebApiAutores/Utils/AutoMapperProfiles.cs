@@ -9,7 +9,13 @@ namespace WebApiAutores.Utils
 
         public AutoMapperProfiles()
         {
+            // Author
             CreateMap<CreateAuthorDTO, Author>();
+            CreateMap<Author, AuthorDTO>();
+
+            // Book
+            CreateMap<CreateBookDTO, Book>();
+            CreateMap<Book, BookDTO>();
         }
 
     }

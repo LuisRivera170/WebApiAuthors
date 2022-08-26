@@ -23,21 +23,34 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Author>>> GetAuthors() {
-            return await context.Authors
+        public async Task<ActionResult<List<AuthorDTO>>> GetAuthors() {
+            var authors = await context.Authors
                 //.Include(author => author.Books)
                 .ToListAsync();
+
+            return mapper.Map<List<AuthorDTO>>(authors);
         }
 
         [HttpGet("{name}")]
         public async Task<IActionResult> GetAuthor([FromRoute] string name) 
         {
-            var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));
+            var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));   
+
             if (author == null)
             {
                 return NotFound($"Author with name \"{name}\" not found");
             }
-            return Ok(author);
+
+
+            return Ok(mapper.Map<AuthorDTO>(author));
+        }
+
+        [HttpGet("{name}/list")]
+        public async Task<ActionResult<List<AuthorDTO>>> GetAuthors([FromRoute] string name)
+        {
+            var authors = await context.Authors.Where(author => author.Name.Contains(name)).ToListAsync();
+
+            return mapper.Map<List<AuthorDTO>>(authors);
         }
 
         [HttpPost]
