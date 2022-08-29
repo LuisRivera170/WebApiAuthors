@@ -14,12 +14,25 @@ namespace WebApiAutores.Controllers
         private readonly ApplicationDbContext context;
         private readonly ILogger<AuthorsController> logger;
         private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
 
-        public AuthorsController(ApplicationDbContext context, ILogger<AuthorsController> logger, IMapper mapper)
+        public AuthorsController(
+            ApplicationDbContext context,
+            ILogger<AuthorsController> logger,
+            IMapper mapper,
+            IConfiguration configuration)
         {
             this.context = context;
             this.logger = logger;
             this.mapper = mapper;
+            this.configuration = configuration;
+        }
+
+        [HttpGet("configs")]
+        public ActionResult<string> getConfigs() 
+        {
+            // configuration["connectionStrings:defaultConnection"];
+            return configuration["Day"];
         }
 
         [HttpGet]
