@@ -19,7 +19,7 @@ namespace WebApiAutores.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("{bookId:int}")]
+        [HttpGet("{bookId:int}", Name = "GetBook")]
         public async Task<ActionResult<BookDTOWithAuthors>> GetBook(int bookId)
         {
             var book = await context.Books
@@ -39,24 +39,24 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostBook(CreateBookDTO bookDTO)
+        public async Task<ActionResult> PostBook(CreateBookDTO createBookDTO)
         {
-            if (bookDTO.AuthorIds == null)
+            if (createBookDTO.AuthorIds == null)
             {
                 return BadRequest("A book cannot be created without authors");
             }
 
             var authorIdsDB = await context.Authors
-                .Where(authorDB => bookDTO.AuthorIds.Contains(authorDB.Id))
+                .Where(authorDB => createBookDTO.AuthorIds.Contains(authorDB.Id))
                 .Select(author => author.Id)
                 .ToListAsync();
 
-            if (bookDTO.AuthorIds.Count != authorIdsDB.Count)
+            if (createBookDTO.AuthorIds.Count != authorIdsDB.Count)
             {
                 return BadRequest("Wrong authors");
             }
 
-            var book = mapper.Map<Book>(bookDTO);
+            var book = mapper.Map<Book>(createBookDTO);
 
             if (book.AuthorsBooks != null)
             {
@@ -68,7 +68,10 @@ namespace WebApiAutores.Controllers
 
             context.Add(book);
             await context.SaveChangesAsync();
-            return Ok();
+
+            var bookDTO = mapper.Map<BookDTO>(book);
+
+            return CreatedAtRoute("GetBook", new { bookId = book.Id }, bookDTO);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 using WebApiAutores.DTOs;
 using WebApiAutores.Entities;
 
@@ -27,8 +28,21 @@ namespace WebApiAutores.Controllers
             return mapper.Map<List<CommentDTO>>(comments);
         }
 
+        [HttpGet("{commentId:int}", Name = "GetCommentById")]
+        public async Task<ActionResult<CommentDTO>> GetCommentById(int commentId)
+        {
+            var comment = await context.Comments.FirstOrDefaultAsync(comment => comment.Id == commentId);
+
+            if (comment == null)
+            {
+                return NotFound($"Comment with id \"{commentId}\" not found");
+            }
+
+            return mapper.Map<CommentDTO>(comment);
+        }
+
         [HttpPost]
-        public async Task<ActionResult> Post(int bookId, CreateCommentDTO commentDTO)
+        public async Task<ActionResult> Post(int bookId, CreateCommentDTO createCommentDTO)
         {
             var book = await context.Books.AnyAsync(book => book.Id == bookId);
             if (!book)
@@ -36,11 +50,14 @@ namespace WebApiAutores.Controllers
                 return BadRequest($"Book with Id {bookId} not found");
             }
 
-            var comment = mapper.Map<Comment>(commentDTO);
+            var comment = mapper.Map<Comment>(createCommentDTO);
             comment.BookId = bookId;
             context.Add(comment);
             await context.SaveChangesAsync();
-            return Ok();
+
+            var commentDTO = mapper.Map<CommentDTO>(comment);
+
+            return CreatedAtRoute("GetCommentById", new { commentId = comment.Id, bookId = bookId }, commentDTO);
         }
 
     }

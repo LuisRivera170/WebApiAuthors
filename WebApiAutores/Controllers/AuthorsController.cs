@@ -54,21 +54,40 @@ namespace WebApiAutores.Controllers
             return mapper.Map<List<AuthorDTO>>(authors);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> PostAuthor([FromBody] CreateAuthorDTO authorDTO)
+        [HttpGet("{authorId:int}", Name="GetAuthorById")]
+        public async Task<ActionResult<AuthorDTOWithBooks>> GetAuthorById(int authorId)
         {
-            var existAuthor = await context.Authors.AnyAsync(author => author.Name == authorDTO.Name);
+            var author = await context.Authors
+                .Include(author => author.AuthorsBooks)
+                .ThenInclude(authorBook => authorBook.Book)
+                .FirstOrDefaultAsync(author => author.Id == authorId);
+
+            if (author == null)
+            {
+                return NotFound($"Author with Id {authorId} not found");
+            }
+
+            return mapper.Map<AuthorDTOWithBooks>(author);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> PostAuthor([FromBody] CreateAuthorDTO createAuthorDTO)
+        {
+            var existAuthor = await context.Authors.AnyAsync(author => author.Name == createAuthorDTO.Name);
 
             if (existAuthor)
             {
-                return BadRequest($"Author with name {authorDTO.Name} al ready exist");
+                return BadRequest($"Author with name {createAuthorDTO.Name} al ready exist");
             }
 
-            var author = mapper.Map<Author>(authorDTO);
+            var author = mapper.Map<Author>(createAuthorDTO);
 
             context.Add(author);
             await context.SaveChangesAsync();
-            return Ok();
+
+            var authorDTO = mapper.Map<AuthorDTO>(author);
+
+            return CreatedAtRoute("GetAuthorById", new { authorId = author.Id }, authorDTO);
         }
 
         [HttpPut("{authorId:int}")]
