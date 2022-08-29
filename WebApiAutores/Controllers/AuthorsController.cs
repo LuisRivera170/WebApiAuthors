@@ -32,7 +32,7 @@ namespace WebApiAutores.Controllers
         public ActionResult<string> getConfigs() 
         {
             // configuration["connectionStrings:defaultConnection"];
-            return configuration["Day"];
+            return configuration["SUBJECT_EMAIL"];
         }
 
         [HttpGet]
