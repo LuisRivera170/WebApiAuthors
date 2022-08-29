@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebApiAutores.DTOs;
+using WebApiAutores.Services;
 
 namespace WebApiAutores.Controllers
 {
@@ -18,18 +19,21 @@ namespace WebApiAutores.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly HashService hashService;
         private readonly IDataProtector dataProtector;
 
         public AccountsController(
             UserManager<IdentityUser> userManager,
             IConfiguration configuration,
             SignInManager<IdentityUser> signInManager,
-            IDataProtectionProvider dataProtectionProvider
+            IDataProtectionProvider dataProtectionProvider,
+            HashService hashService
         )
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.hashService = hashService;
             this.dataProtector = dataProtectionProvider.CreateProtector("UNIQUE_SECRET_VALUE");
         }
 
@@ -114,6 +118,20 @@ namespace WebApiAutores.Controllers
                 plainText,
                 cifredText,
                 decriptedText
+            });
+        }
+
+        [HttpGet("hash/{plainText}")]
+        public ActionResult HashTest(string plainText)
+        {
+            var result1 = hashService.Hash(plainText);
+            var result2 = hashService.Hash(plainText);
+
+            return Ok(new
+            {
+                plainText,
+                result1,
+                result2
             });
         }
 

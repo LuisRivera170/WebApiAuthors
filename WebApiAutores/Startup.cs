@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 using WebApiAutores.Filters;
+using WebApiAutores.Services;
 
 namespace WebApiAutores
 {
@@ -103,6 +104,9 @@ namespace WebApiAutores
                         .AllowAnyHeader();
                 });
             });
+
+            services.AddTransient<HashService>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
