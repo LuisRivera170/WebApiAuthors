@@ -9,6 +9,6 @@ namespace WebApiAutores.DTOs
         [Required]
         [FirstCapitalLetter]
         public string Title { get; set; }
-
+        public List<int> AuthorIds { get; set; }
     }
 }

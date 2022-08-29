@@ -23,12 +23,13 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AuthorDTO>>> GetAuthors() {
+        public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors() {
             var authors = await context.Authors
-                //.Include(author => author.Books)
+                .Include(author => author.AuthorsBooks)
+                .ThenInclude(authorBook => authorBook.Book)
                 .ToListAsync();
 
-            return mapper.Map<List<AuthorDTO>>(authors);
+            return mapper.Map<List<AuthorDTOWithBooks>>(authors);
         }
 
         [HttpGet("{name}")]

@@ -12,7 +12,7 @@ namespace WebApiAutores.Entities
         [StringLength(maximumLength: 50)]
         [FirstCapitalLetter]
         public string Name { get; set; }
-
+        public List<AuthorBook> AuthorsBooks { get; set; }
     }
 }
 
