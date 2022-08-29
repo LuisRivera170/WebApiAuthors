@@ -3,6 +3,8 @@ using WebApiAutores.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApiAutores.Controllers
 {
@@ -36,6 +38,7 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors() {
             var authors = await context.Authors
                 .Include(author => author.AuthorsBooks)
