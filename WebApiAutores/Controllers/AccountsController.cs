@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -59,6 +61,23 @@ namespace WebApiAutores.Controllers
             return BuildToken(userCredentials);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("renew")]
+        public async Task<ActionResult<AuthenticationResponse>> RenewToken()
+        {
+            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            var email = emailClaim.Value;
+            var user = await userManager.FindByEmailAsync(email);
+            var userId = user.Id;
+
+            var userCredentials = new UserCredentials()
+            {
+                Email = email
+            };
+
+            return BuildToken(userCredentials);
+        }
+
         private AuthenticationResponse BuildToken(UserCredentials userCredentials)
         {
             var claims = new List<Claim>()
@@ -68,7 +87,7 @@ namespace WebApiAutores.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSecret"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiration = DateTime.UtcNow.AddHours(1);
+            var expiration = DateTime.UtcNow.AddMinutes(1);
 
             var token = new JwtSecurityToken(
                 issuer: null,
