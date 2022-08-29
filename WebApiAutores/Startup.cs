@@ -89,6 +89,18 @@ namespace WebApiAutores
             {
                 options.AddPolicy("IsAdmin", policy => policy.RequireClaim("isAdmin"));
             });
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        // Add Origins here
+                        .WithOrigins("")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -100,6 +112,7 @@ namespace WebApiAutores
             }
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
