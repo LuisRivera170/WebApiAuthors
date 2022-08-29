@@ -90,6 +90,8 @@ namespace WebApiAutores
                 options.AddPolicy("IsAdmin", policy => policy.RequireClaim("isAdmin"));
             });
 
+            services.AddDataProtection();
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>

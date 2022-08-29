@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,16 +18,19 @@ namespace WebApiAutores.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IDataProtector dataProtector;
 
         public AccountsController(
             UserManager<IdentityUser> userManager,
             IConfiguration configuration,
-            SignInManager<IdentityUser> signInManager
+            SignInManager<IdentityUser> signInManager,
+            IDataProtectionProvider dataProtectionProvider
         )
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.dataProtector = dataProtectionProvider.CreateProtector("UNIQUE_SECRET_VALUE");
         }
 
         [HttpPost("register")]
@@ -98,6 +102,20 @@ namespace WebApiAutores.Controllers
             return NoContent();
         }
 
+        [HttpGet("encrypt")]
+        public ActionResult EncryptTest()
+        {
+            var plainText = "Encryption test";
+            var cifredText = dataProtector.Protect(plainText);
+
+            var decriptedText = dataProtector.Unprotect(cifredText);
+
+            return Ok(new {
+                plainText,
+                cifredText,
+                decriptedText
+            });
+        }
 
         private async Task<AuthenticationResponse> BuildToken(UserCredentials userCredentials)
         {
