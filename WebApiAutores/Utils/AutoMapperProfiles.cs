@@ -24,6 +24,7 @@ namespace WebApiAutores.Utils
                     book => book.AuthorsBooks, 
                     options => options.MapFrom(MapAuthorsBooks)
                 );
+            CreateMap<PatchBookDTO, Book>().ReverseMap();
             CreateMap<Book, BookDTO>();
             CreateMap<Book, BookDTOWithAuthors>()
                 .ForMember(
