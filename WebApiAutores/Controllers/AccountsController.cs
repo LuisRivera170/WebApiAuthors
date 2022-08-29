@@ -14,14 +14,17 @@ namespace WebApiAutores.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
+        private readonly SignInManager<IdentityUser> signInManager;
 
         public AccountsController(
             UserManager<IdentityUser> userManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            SignInManager<IdentityUser> signInManager
         )
         {
             this.userManager = userManager;
             this.configuration = configuration;
+            this.signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -33,6 +36,24 @@ namespace WebApiAutores.Controllers
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
+            }
+
+            return BuildToken(userCredentials);
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthenticationResponse>> Login(UserCredentials userCredentials)
+        {
+            var result = await signInManager.PasswordSignInAsync(
+                userCredentials.Email,
+                userCredentials.Password,
+                isPersistent: false,
+                lockoutOnFailure: false
+            );
+
+            if (!result.Succeeded)
+            {
+                return BadRequest("Bad credentials");
             }
 
             return BuildToken(userCredentials);
