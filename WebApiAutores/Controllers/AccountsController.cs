@@ -40,7 +40,7 @@ namespace WebApiAutores.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return BuildToken(userCredentials);
+            return await BuildToken(userCredentials);
         }
 
         [HttpPost("login")]
@@ -58,7 +58,7 @@ namespace WebApiAutores.Controllers
                 return BadRequest("Bad credentials");
             }
 
-            return BuildToken(userCredentials);
+            return await BuildToken(userCredentials);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -75,19 +75,45 @@ namespace WebApiAutores.Controllers
                 Email = email
             };
 
-            return BuildToken(userCredentials);
+            return await BuildToken(userCredentials);
         }
 
-        private AuthenticationResponse BuildToken(UserCredentials userCredentials)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("grant/admin")]
+        public async Task<ActionResult> GrantAdmin(UpdateAdminDTO updateAdminDTO)
+        {
+            var user = await userManager.FindByEmailAsync(updateAdminDTO.Email);
+            await userManager.AddClaimAsync(user, new Claim("isAdmin", "true"));
+
+            return NoContent();
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("revoke/admin")]
+        public async Task<ActionResult> RevokeAdmin(UpdateAdminDTO updateAdminDTO)
+        {
+            var user = await userManager.FindByEmailAsync(updateAdminDTO.Email);
+            await userManager.RemoveClaimAsync(user, new Claim("isAdmin", "true"));
+
+            return NoContent();
+        }
+
+
+        private async Task<AuthenticationResponse> BuildToken(UserCredentials userCredentials)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email", userCredentials.Email)
             };
 
+            var user = await userManager.FindByEmailAsync(userCredentials.Email);
+            var claimsDB = await userManager.GetClaimsAsync(user);
+
+            claims.AddRange(claimsDB);
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSecret"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiration = DateTime.UtcNow.AddMinutes(1);
+            var expiration = DateTime.UtcNow.AddHours(1);
 
             var token = new JwtSecurityToken(
                 issuer: null,

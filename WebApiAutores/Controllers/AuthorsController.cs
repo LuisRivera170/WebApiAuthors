@@ -123,6 +123,7 @@ namespace WebApiAutores.Controllers
             return NoContent();
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
         [HttpDelete("{authorId:int}")]
         public async Task<ActionResult> DeleteAuthor(int authorId)
         {
