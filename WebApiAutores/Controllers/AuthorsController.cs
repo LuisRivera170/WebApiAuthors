@@ -11,6 +11,7 @@ namespace WebApiAutores.Controllers
 
     [ApiController]
     [Route("api/authors")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthorsController: ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -37,8 +38,8 @@ namespace WebApiAutores.Controllers
             return configuration["SUBJECT_EMAIL"];
         }
 
+        [AllowAnonymous]
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors() {
             var authors = await context.Authors
                 .Include(author => author.AuthorsBooks)
