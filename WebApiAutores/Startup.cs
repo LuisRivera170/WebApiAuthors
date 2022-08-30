@@ -131,7 +131,10 @@ namespace WebApiAutores
                         // Add Origins here
                         .WithOrigins("")
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .WithExposedHeaders(new string[] {
+                            "Total-Records"
+                        });
                 });
             });
 

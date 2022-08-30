@@ -45,12 +45,21 @@ namespace WebApiAutores.Controllers.V1
         [AllowAnonymous]
         [ServiceFilter(typeof(HATEOASAuthorFilterAttribute))]
         [HttpGet(Name = "GetAuthorsV1")]
-        public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors()
+        public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors([FromQuery] PaginationDTO paginationDTO)
         {
-            var authors = await context.Authors
+            var queryable = context.Authors.AsQueryable();
+            await HttpContext.InserPaginationParametersHeaders(queryable);
+            var authors = await queryable
                 .Include(author => author.AuthorsBooks)
                 .ThenInclude(authorBook => authorBook.Book)
+                .OrderBy(author => author.Name)
+                .Paginate(paginationDTO)
                 .ToListAsync();
+
+            /*var authors = await context.Authors
+                .Include(author => author.AuthorsBooks)
+                .ThenInclude(authorBook => authorBook.Book)
+                .ToListAsync();*/
 
             return mapper.Map<List<AuthorDTOWithBooks>>(authors);
         }
