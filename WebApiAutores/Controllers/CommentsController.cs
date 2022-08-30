@@ -28,7 +28,7 @@ namespace WebApiAutores.Controllers
             this.userManager = userManager;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetComments")]
         public async Task<ActionResult<List<CommentDTO>>> GetComments(int bookId)
         {
             var comments = await context.Comments.Where(comment => comment.BookId == bookId).ToListAsync();
@@ -50,7 +50,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost]
+        [HttpPost(Name = "CreateComment")]
         public async Task<ActionResult> PostComment(int bookId, CreateCommentDTO createCommentDTO)
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
@@ -75,7 +75,7 @@ namespace WebApiAutores.Controllers
             return CreatedAtRoute("GetCommentById", new { commentId = comment.Id, bookId = bookId }, commentDTO);
         }
 
-        [HttpPut("{commentId:int}")]
+        [HttpPut("{commentId:int}", Name = "UpdateComment")]
         public async Task<ActionResult> PutComment(int bookId, int commentId, CreateCommentDTO updateCommentDTO)
         {
             var existBook = await context.Books.AnyAsync(book => book.Id == bookId);

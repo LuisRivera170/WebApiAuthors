@@ -37,7 +37,7 @@ namespace WebApiAutores.Controllers
             this.dataProtector = dataProtectionProvider.CreateProtector("UNIQUE_SECRET_VALUE");
         }
 
-        [HttpPost("register")]
+        [HttpPost("register", Name = "RegisterUser")]
         public async Task<ActionResult<AuthenticationResponse>> Post(UserCredentials userCredentials) 
         {
             var user = new IdentityUser { UserName = userCredentials.Email, Email = userCredentials.Email };
@@ -51,7 +51,7 @@ namespace WebApiAutores.Controllers
             return await BuildToken(userCredentials);
         }
 
-        [HttpPost("login")]
+        [HttpPost("login", Name = "Login")]
         public async Task<ActionResult<AuthenticationResponse>> Login(UserCredentials userCredentials)
         {
             var result = await signInManager.PasswordSignInAsync(
@@ -70,7 +70,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("renew")]
+        [HttpGet("renew", Name = "RenewToken")]
         public async Task<ActionResult<AuthenticationResponse>> RenewToken()
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
@@ -87,7 +87,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("grant/admin")]
+        [HttpPost("grant/admin", Name = "GrantAdmin")]
         public async Task<ActionResult> GrantAdmin(UpdateAdminDTO updateAdminDTO)
         {
             var user = await userManager.FindByEmailAsync(updateAdminDTO.Email);
@@ -97,7 +97,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("revoke/admin")]
+        [HttpPost("revoke/admin", Name = "RevokeAdmin")]
         public async Task<ActionResult> RevokeAdmin(UpdateAdminDTO updateAdminDTO)
         {
             var user = await userManager.FindByEmailAsync(updateAdminDTO.Email);

@@ -5,6 +5,7 @@ using WebApiAutores.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApiAutores.Utils;
 
 namespace WebApiAutores.Controllers
 {
@@ -12,35 +13,40 @@ namespace WebApiAutores.Controllers
     [ApiController]
     [Route("api/authors")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class AuthorsController: ControllerBase
+    public class AuthorsController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly ILogger<AuthorsController> logger;
         private readonly IMapper mapper;
         private readonly IConfiguration configuration;
+        private readonly IAuthorizationService authorizationService;
 
         public AuthorsController(
             ApplicationDbContext context,
             ILogger<AuthorsController> logger,
             IMapper mapper,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IAuthorizationService authorizationService)
         {
             this.context = context;
             this.logger = logger;
             this.mapper = mapper;
             this.configuration = configuration;
+            this.authorizationService = authorizationService;
         }
 
         [HttpGet("configs")]
-        public ActionResult<string> getConfigs() 
+        public ActionResult<string> getConfigs()
         {
             // configuration["connectionStrings:defaultConnection"];
             return configuration["SUBJECT_EMAIL"];
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors() {
+        [ServiceFilter(typeof(HATEOASAuthorFilterAttribute))]
+        [HttpGet(Name = "GetAuthors")]
+        public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors()
+        {
             var authors = await context.Authors
                 .Include(author => author.AuthorsBooks)
                 .ThenInclude(authorBook => authorBook.Book)
@@ -49,10 +55,10 @@ namespace WebApiAutores.Controllers
             return mapper.Map<List<AuthorDTOWithBooks>>(authors);
         }
 
-        [HttpGet("{name}")]
-        public async Task<IActionResult> GetAuthor([FromRoute] string name) 
+        [HttpGet("{name}", Name = "GetAuthorByName")]
+        public async Task<IActionResult> GetAuthor([FromRoute] string name)
         {
-            var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));   
+            var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));
 
             if (author == null)
             {
@@ -63,15 +69,17 @@ namespace WebApiAutores.Controllers
             return Ok(mapper.Map<AuthorDTO>(author));
         }
 
-        [HttpGet("{name}/list")]
-        public async Task<ActionResult<List<AuthorDTO>>> GetAuthors([FromRoute] string name)
+        [HttpGet("{name}/list", Name = "GetAuthorsByName")]
+        public async Task<ActionResult<List<AuthorDTO>>> GetAuthorsByName([FromRoute] string name)
         {
             var authors = await context.Authors.Where(author => author.Name.Contains(name)).ToListAsync();
 
             return mapper.Map<List<AuthorDTO>>(authors);
         }
 
-        [HttpGet("{authorId:int}", Name="GetAuthorById")]
+        [AllowAnonymous]
+        [ServiceFilter(typeof(HATEOASAuthorFilterAttribute))]
+        [HttpGet("{authorId:int}", Name = "GetAuthorById")]
         public async Task<ActionResult<AuthorDTOWithBooks>> GetAuthorById(int authorId)
         {
             var author = await context.Authors
@@ -83,11 +91,11 @@ namespace WebApiAutores.Controllers
             {
                 return NotFound($"Author with Id {authorId} not found");
             }
-
+            
             return mapper.Map<AuthorDTOWithBooks>(author);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateAuthor")]
         public async Task<ActionResult> PostAuthor([FromBody] CreateAuthorDTO createAuthorDTO)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Name == createAuthorDTO.Name);
@@ -107,7 +115,7 @@ namespace WebApiAutores.Controllers
             return CreatedAtRoute("GetAuthorById", new { authorId = author.Id }, authorDTO);
         }
 
-        [HttpPut("{authorId:int}")]
+        [HttpPut("{authorId:int}", Name = "UpdateAuthor")]
         public async Task<ActionResult> PutAuthor(CreateAuthorDTO updateAuthorDTO, int authorId)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);
@@ -117,6 +125,7 @@ namespace WebApiAutores.Controllers
             }
             var author = mapper.Map<Author>(updateAuthorDTO);
             author.Id = authorId;
+
             context.Update(author);
             await context.SaveChangesAsync();
 
@@ -124,7 +133,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-        [HttpDelete("{authorId:int}")]
+        [HttpDelete("{authorId:int}", Name = "DeleteAuthor")]
         public async Task<ActionResult> DeleteAuthor(int authorId)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);

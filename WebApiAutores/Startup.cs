@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,6 +9,8 @@ using System.Text;
 using System.Text.Json.Serialization;
 using WebApiAutores.Filters;
 using WebApiAutores.Services;
+using WebApiAutores.Utils;
+using LinkGenerator = WebApiAutores.Services.LinkGenerator;
 
 namespace WebApiAutores
 {
@@ -55,6 +58,8 @@ namespace WebApiAutores
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
+                c.OperationFilter<AddParamHATEOAS>();
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -106,7 +111,9 @@ namespace WebApiAutores
             });
 
             services.AddTransient<HashService>();
-
+            services.AddTransient<LinkGenerator>();
+            services.AddTransient<HATEOASAuthorFilterAttribute>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
