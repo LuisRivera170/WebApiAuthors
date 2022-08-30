@@ -10,11 +10,11 @@ using System.Text;
 using WebApiAutores.DTOs;
 using WebApiAutores.Services;
 
-namespace WebApiAutores.Controllers
+namespace WebApiAutores.Controllers.V1
 {
     [ApiController]
-    [Route("api/accounts")]
-    public class AccountsController:  ControllerBase
+    [Route("api/v1/accounts")]
+    public class AccountsController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
@@ -34,11 +34,11 @@ namespace WebApiAutores.Controllers
             this.configuration = configuration;
             this.signInManager = signInManager;
             this.hashService = hashService;
-            this.dataProtector = dataProtectionProvider.CreateProtector("UNIQUE_SECRET_VALUE");
+            dataProtector = dataProtectionProvider.CreateProtector("UNIQUE_SECRET_VALUE");
         }
 
         [HttpPost("register", Name = "RegisterUser")]
-        public async Task<ActionResult<AuthenticationResponse>> Post(UserCredentials userCredentials) 
+        public async Task<ActionResult<AuthenticationResponse>> Post(UserCredentials userCredentials)
         {
             var user = new IdentityUser { UserName = userCredentials.Email, Email = userCredentials.Email };
             var result = await userManager.CreateAsync(user, userCredentials.Password);
@@ -114,7 +114,8 @@ namespace WebApiAutores.Controllers
 
             var decriptedText = dataProtector.Unprotect(cifredText);
 
-            return Ok(new {
+            return Ok(new
+            {
                 plainText,
                 cifredText,
                 decriptedText

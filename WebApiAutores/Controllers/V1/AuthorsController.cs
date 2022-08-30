@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApiAutores.Utils;
 
-namespace WebApiAutores.Controllers
+namespace WebApiAutores.Controllers.V1
 {
 
     [ApiController]
-    [Route("api/authors")]
+    [Route("api/v1/authors")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthorsController : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace WebApiAutores.Controllers
             this.authorizationService = authorizationService;
         }
 
-        [HttpGet("configs")]
+        [HttpGet("configsV1")]
         public ActionResult<string> getConfigs()
         {
             // configuration["connectionStrings:defaultConnection"];
@@ -44,7 +44,7 @@ namespace WebApiAutores.Controllers
 
         [AllowAnonymous]
         [ServiceFilter(typeof(HATEOASAuthorFilterAttribute))]
-        [HttpGet(Name = "GetAuthors")]
+        [HttpGet(Name = "GetAuthorsV1")]
         public async Task<ActionResult<List<AuthorDTOWithBooks>>> GetAuthors()
         {
             var authors = await context.Authors
@@ -55,7 +55,7 @@ namespace WebApiAutores.Controllers
             return mapper.Map<List<AuthorDTOWithBooks>>(authors);
         }
 
-        [HttpGet("{name}", Name = "GetAuthorByName")]
+        [HttpGet("{name}", Name = "GetAuthorByNameV1")]
         public async Task<IActionResult> GetAuthor([FromRoute] string name)
         {
             var author = await context.Authors.FirstOrDefaultAsync(author => author.Name.Contains(name));
@@ -69,17 +69,16 @@ namespace WebApiAutores.Controllers
             return Ok(mapper.Map<AuthorDTO>(author));
         }
 
-        [HttpGet("{name}/list", Name = "GetAuthorsByName")]
+        [HttpGet("{name}/list", Name = "GetAuthorsByNameV1")]
         public async Task<ActionResult<List<AuthorDTO>>> GetAuthorsByName([FromRoute] string name)
         {
             var authors = await context.Authors.Where(author => author.Name.Contains(name)).ToListAsync();
-
             return mapper.Map<List<AuthorDTO>>(authors);
         }
 
         [AllowAnonymous]
         [ServiceFilter(typeof(HATEOASAuthorFilterAttribute))]
-        [HttpGet("{authorId:int}", Name = "GetAuthorById")]
+        [HttpGet("{authorId:int}", Name = "GetAuthorByIdV1")]
         public async Task<ActionResult<AuthorDTOWithBooks>> GetAuthorById(int authorId)
         {
             var author = await context.Authors
@@ -91,11 +90,11 @@ namespace WebApiAutores.Controllers
             {
                 return NotFound($"Author with Id {authorId} not found");
             }
-            
+
             return mapper.Map<AuthorDTOWithBooks>(author);
         }
 
-        [HttpPost(Name = "CreateAuthor")]
+        [HttpPost(Name = "CreateAuthorV1")]
         public async Task<ActionResult> PostAuthor([FromBody] CreateAuthorDTO createAuthorDTO)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Name == createAuthorDTO.Name);
@@ -112,10 +111,10 @@ namespace WebApiAutores.Controllers
 
             var authorDTO = mapper.Map<AuthorDTO>(author);
 
-            return CreatedAtRoute("GetAuthorById", new { authorId = author.Id }, authorDTO);
+            return CreatedAtRoute("GetAuthorByIdV1", new { authorId = author.Id }, authorDTO);
         }
 
-        [HttpPut("{authorId:int}", Name = "UpdateAuthor")]
+        [HttpPut("{authorId:int}", Name = "UpdateAuthorV1")]
         public async Task<ActionResult> PutAuthor(CreateAuthorDTO updateAuthorDTO, int authorId)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);
@@ -133,7 +132,7 @@ namespace WebApiAutores.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-        [HttpDelete("{authorId:int}", Name = "DeleteAuthor")]
+        [HttpDelete("{authorId:int}", Name = "DeleteAuthorV1")]
         public async Task<ActionResult> DeleteAuthor(int authorId)
         {
             var existAuthor = await context.Authors.AnyAsync(author => author.Id == authorId);

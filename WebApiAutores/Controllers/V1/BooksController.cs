@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using WebApiAutores.DTOs;
 using WebApiAutores.Entities;
 
-namespace WebApiAutores.Controllers
+namespace WebApiAutores.Controllers.V1
 {
     [ApiController]
-    [Route("api/books")]
-    public class BooksController: ControllerBase
+    [Route("api/v1/books")]
+    public class BooksController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
@@ -129,7 +129,7 @@ namespace WebApiAutores.Controllers
             return NoContent();
         }
 
-        private void asignOrder(Book book) 
+        private void asignOrder(Book book)
         {
             if (book.AuthorsBooks != null)
             {

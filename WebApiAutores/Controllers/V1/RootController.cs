@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApiAutores.DTOs;
 
-namespace WebApiAutores.Controllers
+namespace WebApiAutores.Controllers.V1
 {
 
     [ApiController]
-    [Route("api")]
+    [Route("api/v1")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class RootController: ControllerBase
+    public class RootController : ControllerBase
     {
         private readonly IAuthorizationService authorizationService;
 
@@ -27,7 +27,7 @@ namespace WebApiAutores.Controllers
             var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
 
 
-            dataHATEOAS.Add(new DataHATEOAS(link: Url.Link("GetRoot", new {}), description: "self", method: "GET"));
+            dataHATEOAS.Add(new DataHATEOAS(link: Url.Link("GetRoot", new { }), description: "self", method: "GET"));
             dataHATEOAS.Add(new DataHATEOAS(link: Url.Link("GetAuthors", new { }), description: "authors", method: "GET"));
             dataHATEOAS.Add(new DataHATEOAS(link: Url.Link("CreateAuthor", new { }), description: "author-create", method: "POST"));
             dataHATEOAS.Add(new DataHATEOAS(link: Url.Link("CreateBook", new { }), description: "book-create", method: "POST"));

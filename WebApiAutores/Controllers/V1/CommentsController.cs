@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore;
 using WebApiAutores.DTOs;
 using WebApiAutores.Entities;
 
-namespace WebApiAutores.Controllers
+namespace WebApiAutores.Controllers.V1
 {
     [ApiController]
-    [Route("api/books/{bookId:int}/comments")]
-    public class CommentsController: ControllerBase
+    [Route("api/v1/books/{bookId:int}/comments")]
+    public class CommentsController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly UserManager<IdentityUser> userManager;
 
         public CommentsController(
-            ApplicationDbContext context, 
+            ApplicationDbContext context,
             IMapper mapper,
             UserManager<IdentityUser> userManager
         )
@@ -32,7 +32,7 @@ namespace WebApiAutores.Controllers
         public async Task<ActionResult<List<CommentDTO>>> GetComments(int bookId)
         {
             var comments = await context.Comments.Where(comment => comment.BookId == bookId).ToListAsync();
-            
+
             return mapper.Map<List<CommentDTO>>(comments);
         }
 
@@ -72,7 +72,7 @@ namespace WebApiAutores.Controllers
 
             var commentDTO = mapper.Map<CommentDTO>(comment);
 
-            return CreatedAtRoute("GetCommentById", new { commentId = comment.Id, bookId = bookId }, commentDTO);
+            return CreatedAtRoute("GetCommentById", new { commentId = comment.Id, bookId }, commentDTO);
         }
 
         [HttpPut("{commentId:int}", Name = "UpdateComment")]
