@@ -131,6 +131,11 @@ namespace WebApiAutores.Controllers.V1
             return NoContent();
         }
 
+        /// <summary>
+        /// Deletes an author
+        /// </summary>
+        /// <param name="authorId">Author identifier</param>
+        /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
         [HttpDelete("{authorId:int}", Name = "DeleteAuthorV1")]
         public async Task<ActionResult> DeleteAuthor(int authorId)

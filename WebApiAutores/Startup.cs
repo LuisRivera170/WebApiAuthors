@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using WebApiAutores.Filters;
@@ -12,6 +14,7 @@ using WebApiAutores.Services;
 using WebApiAutores.Utils;
 using LinkGenerator = WebApiAutores.Services.LinkGenerator;
 
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace WebApiAutores
 {
     public class Startup
@@ -59,7 +62,21 @@ namespace WebApiAutores
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApiAuthors", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "WebApiAuthors",
+                    Version = "v1",
+                    Description = "Web Api to work with authors and books",
+                    Contact = new OpenApiContact
+                    {
+                        Email = "luis@fakemail.com",
+                        Name = "Luis",
+                        Url = new Uri("https://luis.com")
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT"
+                    }
+                });
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "WebApiAuthors", Version = "v2" });
 
                 c.OperationFilter<AddParamHATEOAS>();
@@ -87,6 +104,10 @@ namespace WebApiAutores
                         new String[] {}
                     }
                 });
+
+                var fileXml = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var pathXml = Path.Combine(AppContext.BaseDirectory, fileXml);
+                c.IncludeXmlComments(pathXml);
             });
 
             services.AddAutoMapper(typeof(Startup));
